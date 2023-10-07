@@ -1,11 +1,44 @@
 import React, {useState} from 'react';
+
 export default function TextForm(props) {
+   
+    const [listening, setListening] = useState(false);
+    const recognition = new window.webkitSpeechRecognition();
+  
+    const handleTextChange = (event) => {
+      setText(event.target.value);
+    };
+  
+    const startListening = () => {
+      recognition.lang = 'en-US';
+      recognition.start();
+      recognition.onstart = () => {
+        setListening(true);
+      };
+  
+      recognition.onend = () => {
+        setListening(false);
+      };
+  
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setText(transcript);
+      };
+    }
+  
+    const stopListening = () => {
+      recognition.stop();
+      setListening(false);
+    };
+  
     const handleUpClick = ()=>{
         let newText = text.toUpperCase();
         setText(newText)
         props.showAlert("Converted to uppercase!", "success");
     }
-
+    
+    
+      
     const replaceString=()=>{
         let repval=prompt("Enter the word to be replaced:")
         let tobereplaced= new RegExp(repval,'g');
@@ -44,7 +77,6 @@ export default function TextForm(props) {
         setText(event.target.value) 
     }
 
-    
     const handleCopy = () => {
         navigator.clipboard.writeText(text); 
         props.showAlert("Copied to Clipboard!", "success");
@@ -72,11 +104,22 @@ export default function TextForm(props) {
         <div className="container" style={{color: props.mode==='dark'?'white':'#042743'}}> 
             <h1 className='mb-4'>{props.heading}</h1>
             <div className="mb-3"> 
-            <textarea className="form-control" value={text} onChange={handleOnChange} style={{backgroundColor: props.mode==='dark'?'#13466e':'white', color: props.mode==='dark'?'white':'#042743' ,
+            <div>
+            <textarea className="form-control" value={text} onChange={handleTextChange} onChange={handleOnChange}  style={{backgroundColor: props.mode==='dark'?'#13466e':'white', color: props.mode==='dark'?'white':'#042743' ,
     fontWeight: isBold ? 'bold' : 'normal', 
     fontStyle: isItalics ? 'italic' : 'normal'
-    } } id="myBox" rows="8"></textarea>
+    } } id="myBox" rows="8"> </textarea>
             </div>
+            {listening ? (
+          <button onClick={stopListening} className="btn btn-dark mx-1 my-1">
+            Stop Listening
+          </button>
+        ) : (
+          <button onClick={startListening} className="btn btn-dark mx-1 my-1">
+            Start Listening
+          </button>
+        )}
+        </div>
             <button disabled={text.length===0} className="btn btn-primary mx-1 my-1" onClick={handleUpClick}>convert to Uppercase</button>
             <button disabled={text.length===0} className="btn btn-primary mx-1 my-1" onClick={handleLoClick}>convert to Lowercase</button>
             <button disabled={text.length===0} className="btn btn-primary mx-1 my-1" onClick={handleClearClick}>Clear Text</button>
@@ -88,13 +131,17 @@ export default function TextForm(props) {
             <button  disabled={text.length===0} className="btn btn-primary mx-1 my-1" onClick={() => setIsBold(isBold => !isBold)}>
 Text Bold
       </button>
+       <button disabled={text.length===0} className="btn btn-primary mx-1 my-1" onClick={findind} >Find Index</button>
 
       <button  disabled={text.length===0} className="btn btn-primary mx-1 my-1" onClick={() => setItalics(isItalics => !isItalics)}>
       Text Italics
       </button>
-
       
+      
+     
          </div>
+
+
         <div className="container my-3" style={{color: props.mode==='dark'?'white':'#042743'}}>
             <h2>Your text summary</h2>
             <p>{text.split(/\s+/).filter((element)=>{return element.length!==0}).length} words and {text.length} characters</p>

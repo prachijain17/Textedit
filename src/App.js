@@ -5,6 +5,7 @@ import About from './components/About';
 import Bganimatee from './components/Bganimatee';
 import React, { useState } from 'react';
 import Alert from './components/Alert';
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -14,6 +15,8 @@ import {
 function App() {
   const [mode, setMode] = useState('light'); 
   const [alert, setAlert] = useState(null);
+ 
+
 
   const showAlert = (message, type)=>{ 
       setAlert({
@@ -56,6 +59,7 @@ function App() {
     </Switch>
     </div>
     </Router>
+    
     </> 
   );
 }
